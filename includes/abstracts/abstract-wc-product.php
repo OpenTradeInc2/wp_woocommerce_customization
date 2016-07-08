@@ -273,13 +273,13 @@ class WC_Product {
 			switch ( $mode ) {
 				case 'add' :
 					$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->postmeta} SET meta_value = meta_value + %f WHERE post_id = %d AND meta_key='_stock'", $amount, $this->id ) );
-				break;
+					break;
 				case 'subtract' :
 					$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->postmeta} SET meta_value = meta_value - %f WHERE post_id = %d AND meta_key='_stock'", $amount, $this->id ) );
-				break;
+					break;
 				default :
 					$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->postmeta} SET meta_value = %f WHERE post_id = %d AND meta_key='_stock'", $amount, $this->id ) );
-				break;
+					break;
 			}
 
 			// Clear caches
@@ -671,7 +671,7 @@ class WC_Product {
 
 					case 'no_amount' :
 						$availability = __( 'In stock', 'woocommerce' );
-					break;
+						break;
 
 					case 'low_amount' :
 						if ( $this->get_total_stock() <= get_option( 'woocommerce_notify_low_stock_amount' ) ) {
@@ -683,7 +683,7 @@ class WC_Product {
 						} else {
 							$availability = __( 'In stock', 'woocommerce' );
 						}
-					break;
+						break;
 
 					default :
 						$availability = sprintf( __( '%s in stock', 'woocommerce' ), $this->get_total_stock() );
@@ -691,7 +691,7 @@ class WC_Product {
 						if ( $this->backorders_allowed() && $this->backorders_require_notification() ) {
 							$availability .= ' ' . __( '(can be backordered)', 'woocommerce' );
 						}
-					break;
+						break;
 				}
 
 				$class        = 'in-stock';
@@ -739,21 +739,21 @@ class WC_Product {
 		if ( ! $this->post ) {
 			$visible = false;
 
-		// Published/private
+			// Published/private
 		} elseif ( $this->post->post_status !== 'publish' && ! current_user_can( 'edit_post', $this->id ) ) {
 			$visible = false;
 
-		// Out of stock visibility
+			// Out of stock visibility
 		} elseif ( 'yes' === get_option( 'woocommerce_hide_out_of_stock_items' ) && ! $this->is_in_stock() ) {
 			$visible = false;
 
-		// visibility setting
+			// visibility setting
 		} elseif ( 'hidden' === $this->visibility ) {
 			$visible = false;
 		} elseif ( 'visible' === $this->visibility ) {
 			$visible = true;
 
-		// Visibility in loop
+			// Visibility in loop
 		} elseif ( is_search() ) {
 			$visible = 'search' === $this->visibility;
 		} else {
@@ -785,11 +785,11 @@ class WC_Product {
 		if ( ! $this->exists() ) {
 			$purchasable = false;
 
-		// Other products types need a price to be set
+			// Other products types need a price to be set
 		} elseif ( $this->get_price() === '' ) {
 			$purchasable = false;
 
-		// Check the product is published
+			// Check the product is published
 		} elseif ( $this->post->post_status !== 'publish' && ! current_user_can( 'edit_post', $this->id ) ) {
 			$purchasable = false;
 		}
@@ -875,11 +875,11 @@ class WC_Product {
 					$base_tax_amount    = array_sum( $base_taxes );
 					$price              = round( $price * $qty - $base_tax_amount, wc_get_price_decimals() );
 
-				/**
-				 * The woocommerce_adjust_non_base_location_prices filter can stop base taxes being taken off when dealing with out of base locations.
-				 * e.g. If a product costs 10 including tax, all users will pay 10 regardless of location and taxes.
-				 * This feature is experimental @since 2.4.7 and may change in the future. Use at your risk.
-				 */
+					/**
+					 * The woocommerce_adjust_non_base_location_prices filter can stop base taxes being taken off when dealing with out of base locations.
+					 * e.g. If a product costs 10 including tax, all users will pay 10 regardless of location and taxes.
+					 * This feature is experimental @since 2.4.7 and may change in the future. Use at your risk.
+					 */
 				} elseif ( $tax_rates !== $base_tax_rates && apply_filters( 'woocommerce_adjust_non_base_location_prices', true ) ) {
 
 					$base_taxes         = WC_Tax::calc_tax( $price * $qty, $base_tax_rates, true );
@@ -1042,8 +1042,8 @@ class WC_Product {
 		$display_price         = $this->get_display_price();
 		$display_regular_price = $this->get_display_price( $this->get_regular_price() );
 
-		$packaging_unit = $this->get_attribute(7);
-		$packaging_measure = $this->get_attribute(8);
+		$packaging_unit = $this->get_attribute(8);
+		$packaging_measure = $this->get_attribute(9);
 
 		if($packaging_unit == null or $packaging_unit == ''){
 
@@ -1094,7 +1094,8 @@ class WC_Product {
 			}
 		}
 		$value = ' ('.$packaging_unit.' '.$packaging_measure.')</span>';
-		$price = str_replace('</span>',$value,$price);
+		$price = str_replace('</span>','',$price);
+		$price = $price.''.$value;
 		return apply_filters( 'woocommerce_get_price_html', $price, $this );
 	}
 
@@ -1106,9 +1107,9 @@ class WC_Product {
 	 */
 	public function get_price_by_measure_html( $price = '' ) {
 
-		$packaging_measure = $this->get_attribute(8);
-		$price_by_lb = $this->get_attribute(15);
-		$price_by_kg = $this->get_attribute(16);
+		$packaging_measure = $this->get_attribute(9);
+		$price_by_lb = $this->get_attribute(16);
+		$price_by_kg = $this->get_attribute(17);
 
 
 		if($packaging_measure == null or $packaging_measure == ''){
